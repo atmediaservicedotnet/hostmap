@@ -1,4 +1,7 @@
 require 'set'
+require 'socket'
+require 'timeout'
+
 begin
 require 'net/https'
 rescue Exception
@@ -35,6 +38,24 @@ PlugMan.define :sslcertbyaddress do
   extension_points []
   params({ :description => "Check the X.509 certificate from the web server." })
 
+  def check_open_port?(ip,port) 
+  	begin
+    	Timeout::timeout(1) do
+    	  begin
+        	s = TCPSocket.new(ip, port)
+        	s.close
+        	return true
+      	rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        	return false
+      	end
+   	 end
+  	rescue Timeout::Error
+  	end
+
+  	return false
+
+  end
+
   def run(ip, opts = {})
     @hosts = Set.new
 
@@ -46,6 +67,11 @@ PlugMan.define :sslcertbyaddress do
 
     opts['httpports'].to_s.split(",").each do |port|
       begin
+
+		if !check_open_port?(ip,port)
+			$LOG.debug("Port #{i} unreachable [:sslcertbyaddress]")
+			next
+		end
         http = Net::HTTP.new(ip, port.to_i)
         http.use_ssl = true
 		http.verify_mode = OpenSSL::SSL::VERIFY_NONE
