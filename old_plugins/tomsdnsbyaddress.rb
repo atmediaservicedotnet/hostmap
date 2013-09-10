@@ -17,6 +17,7 @@ PlugMan.define :tomsdnsbyaddress do
 
   def run(ip, opts = {})
     @hosts = Set.new
+	#AAS motore di ricerca che non fa nient'altro che richiamare serversniff.net. TODO: da eliminare
 	return @hosts
 
     begin

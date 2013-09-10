@@ -27,7 +27,7 @@
 		<description value="Gigablast plugin"/>
 		<!-- microsoft.com :D-->
 		<plugin name=":gigablastbyaddress" type="ip"/>
-		<parameter value="microsoft.com"/>	
+		<parameter value="seat.it"/>	
 		<result var="hostname" regexp="google"/>
 	</source>
 	<source>

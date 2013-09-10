@@ -64,20 +64,13 @@ Find.find(PLUGINDIR+"/web") do |path|
 end
 
 options = {}
-options[:plugin_spec] = ""
-begin
 opts = OptionParser.new do |opts|
 	opts.banner = "Usage: #$0 -p ALL|<plugin>"
-	options[:plugin_spec] = ""
+	options[:plugin_spec]= ""
 	opts.on("-p [STRING]", "--plugin [STRING]", "set target plugin: ALL for all web plugins") do |t|
-		if t.size > 0
-			options[:plugin_spec] = t
-		end
+		options[:plugin_spec] = t
 	end
 end.parse!
-rescue Exception => e
-	exit 1
-end
 
 if options.size==0 || options[:plugin_spec].size==0
 	puts "Usage: #$0 -p ALL|<plugin>"
@@ -107,19 +100,14 @@ begin
 	doc.validate(dtd)
 
 rescue Exception => e
-
 	puts "#{e.inspect}"
-
 	exit 1
 
 end
 
 found = true
-
 index = 1
-
 plugins = []
-
 plugin_types = []
 
 while found
@@ -137,8 +125,8 @@ while found
 		plug.name=doc.find("/HostmapTests/source[#{index}]/plugin/@name").first.value	
 
 		plug.type=doc.find("/HostmapTests/source[#{index}]/plugin/@type").first.value	
-
 		plugin_types << plug.type
+
 
 		plug.parm_value=doc.find("/HostmapTests/source[#{index}]/parameter/@value").first.value	
 
@@ -180,9 +168,15 @@ end
 
 plugin_types = plugin_types.uniq
 
+#plugins.each do |plugin|
+#	puts "Found plugin #{plugin.name}"
+#end
 
 #loading all plugins
 PlugMan.load_plugins PLUGINDIR  
+
+#starting only plugins configured for test
+#PlugMan.start_plugin(:main)
 
 if options[:plugin_spec] == "ALL"
 	PlugMan.start_all_plugins
@@ -267,5 +261,4 @@ plugin_types.each do |type|
 end
 	
 puts ""
-
 PlugMan.stop_all_plugins
